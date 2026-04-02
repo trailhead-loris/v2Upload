@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo Salesforce - InChatUploadGIT </title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f4f6f9; margin: 0; }
+    .box { background: #fff; padding: 30px; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: left; width: 380px; }
+    h1 { margin: 0 0 25px; font-size: 26px; text-align: center; color: #1a1a1a; }
+    
+    /* Stile per le righe del form */
+    .form-row { margin-bottom: 15px; }
+    .form-row label { display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; }
+    
+    /* Stile per input e select uniformati */
+    select, input[type="text"] { 
+        width: 100%; 
+        padding: 8px 10px; 
+        border-radius: 4px; 
+        border: 1px solid #ccc; 
+        font-size: 14px; 
+        box-sizing: border-box; /* Assicura che il padding non sballi la larghezza */
+        background-color: #fff;
+    }
+    
+    input[type="text"]:focus, select:focus { border-color: #0070d2; outline: none; box-shadow: 0 0 3px rgba(0,112,210, 0.3); }
+
+    .btn-start { display: block; width: 100%; padding: 12px; background-color: #0070d2; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 25px; transition: background 0.3s; }
+    .btn-start:hover { background-color: #005fb2; }
+    .btn-start:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    .status { font-size: 13px; text-align: center; color: #0969da; margin-top: 15px; font-weight: 600; min-height: 20px;}
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>Test Agentforce Enhanced InChatUpload. </h1>
+    
+    <div class="form-row" style="background-color: #fafffa; border: 1px solid #cce5cc; padding: 10px; border-radius: 6px;">
+        <label for="language-picker">Lingua Chat</label>
+        <select id="language-picker">
+            <option value="it">Italiano (IT)</option>
+            <option value="en_US">English (US)</option>
+            <option value="en_UK">English (UK)</option>
+            <option value="en_GB">English (GB)</option>
+            <option value="en">English (en)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="pt_PT">Portoghese (pt_PT)</option>
+            <option value="pt_BR">Portoghese (pt_BR)</option>
+            <option value="pt">Portoghese (pt)</option>
+            <option value="cs">Czech (cs)</option>            
+            <option value="hu">Ungherese (hu)</option>
+            <option value="bg">Bulgaro (BG)</option>
+            <option value="ro">Romanian (ro)</option>
+            <option value="pl">Polacco (pl)</option>
+            <option value="es">Español (es)</option>
+            <option value="hr">Croato (hr)</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="input-fullname">Nome Completo (fullname)</label>
+        <input type="text" id="input-fullname" value="Mario Bianchi" placeholder="Es. Mario Rossi">
+    </div>
+
+    <div class="form-row">
+        <label for="input-type">Tipo Utente (userType)</label>
+        <input type="text" id="input-type" value="consultant" placeholder="Es. consultant">
+    </div>
+
+    <div class="form-row">
+        <label for="input-id">ID Utente (userId)</label>
+        <input type="text" id="input-id" value="12345" placeholder="Es. 12345">
+    </div>
+
+    <div class="form-row">
+        <label for="input-nationality">Nazionalità (nationality)</label>
+        <input type="text" id="input-nationality" value="FR" placeholder="Es. IT, FR, ES">
+    </div>
+    
+    <button id="start-btn" class="btn-start" onclick="startChatSession()">Inizializza Chat</button>
+
+    <div id="status-msg" class="status">Configura i dati e clicca Inizializza</div>
+
+    <p style="text-align:center; color:#999; font-size:11px; margin-top:25px;">
+        Chogan Demo Environment
+    </p>
+  </div>
+
+  <script type='text/javascript'>
+    
+    function startChatSession() {
+        // Disabilita il bottone per evitare doppi click e modifiche durante il caricamento
+        const btn = document.getElementById('start-btn');
+        btn.disabled = true;
+        btn.innerText = "Caricamento...";
+        
+        // Disabilita gli input
+        document.getElementById('language-picker').disabled = true;
+        document.getElementById('input-fullname').disabled = true;
+        document.getElementById('input-type').disabled = true;
+        document.getElementById('input-id').disabled = true;
+        document.getElementById('input-nationality').disabled = true;
+
+        // Recupera la lingua scelta dalla Select
+        const selectedLang = document.getElementById('language-picker').value;
+        console.log("--> LINGUA SELEZIONATA:", selectedLang);
+
+        initEmbeddedMessaging(selectedLang);
+    }
+
+    function initEmbeddedMessaging(langCode) {
+        console.log("--> INIT SALESFORCE START <--");
+
+        try {
+            // 1. IMPOSTAZIONI DEL CANALE (UI del Widget)
+            embeddedservice_bootstrap.settings.language = langCode;
+            
+            embeddedservice_bootstrap.settings.enableUserInputForConversationWithBot = false;
+
+            // 2. GESTIONE EVENTO PRE-CHAT (Per Agentforce)
+            window.addEventListener("onEmbeddedMessagingReady", () => {
+                console.log(">>> EVENTO: Messaging Ready. Invio parametri...");
+                
+                try {
+                    // Recuperiamo i valori freschi dagli input
+                    const fName = document.getElementById('input-fullname').value;
+                    const uType = document.getElementById('input-type').value;
+                    const uId   = document.getElementById('input-id').value;
+                    const uNat  = document.getElementById('input-nationality').value;
+
+                    // Costruiamo l'oggetto con i dati utente presi dal form
+                    const hiddenFields = {
+                        "fullname": fName,
+                        "userType": uType,
+                        "nationality": uNat,
+                        "userId": uId,
+
+                    };
+
+                    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+
+                    console.log(">>> Parametri Hidden inviati:", hiddenFields);
+                    
+                    document.getElementById('status-msg').innerText = "Chat Pronta (" + langCode + ")";
+                    document.getElementById('status-msg').style.color = "green";
+                    document.getElementById('start-btn').style.display = 'none'; // Nascondi bottone
+
+                } catch (e) {
+                    console.error("Errore hidden fields:", e);
+                    document.getElementById('status-msg').innerText = "Errore Parametri";
+                    document.getElementById('status-msg').style.color = "red";
+                }
+            });
+
+            // 3. GESTIONE CLICK LINK - AGGIORNATA PER FORMULA CON ANCHOR (#)
+            // Intercetta i link che iniziano con #, li pulisce e forza l'apertura nella stessa tab
+            window.addEventListener("onEmbeddedMessageLinkClicked", (event) => {
+                const clickedUrl = event.detail.url;
+                console.log("DEBUG - Link cliccato ricevuto:", clickedUrl);
+
+                // CASO A: Il link inizia con # (Es: #https://chogan...)
+                // Questo impedisce al browser di aprire una nuova tab automaticamente
+                if (clickedUrl && clickedUrl.startsWith("#") && clickedUrl.includes("uploadfile")) {
+                    
+                    // Rimuoviamo il primo carattere (#) per ottenere l'URL reale
+                    const realUrl = clickedUrl.substring(1);
+                    
+                    console.log(">>> Anchor Link rilevato. Reindirizzamento forzato self a:", realUrl);
+                    
+                    // Forza la navigazione nella STESSA scheda
+                    window.location.href = realUrl;
+                }
+                
+                // CASO B: Fallback per link normali (nel caso la formula non abbia messo il #)
+                else if (clickedUrl && clickedUrl.includes("uploadfile")) {
+                     console.log("Link standard rilevato (senza #). Provo a reindirizzare...");
+                     window.location.href = clickedUrl;
+                }
+            });
+
+            // 4. INIZIALIZZAZIONE EFFETTIVA
+            embeddedservice_bootstrap.init(
+                '00DUA000003hFV7',
+                'GitV2ZEDmanual_pre_chat',
+                'https://chogangroup--devai2.sandbox.my.site.com/ESWGitV2ZEDmanualprecha1775141654548',
+                {
+                    scrt2URL: 'https://chogangroup--devai2.sandbox.my.salesforce-scrt.com'
+                }
+            );
+
+        } catch (err) {
+            console.error('Errore critico durante Init:', err);
+            document.getElementById('status-msg').innerText = "Errore Init";
+        }
+    };
+  </script>
+  
+  <script type='text/javascript' src='https://chogangroup--devai2.sandbox.my.site.com/ESWGitV2ZEDmanualprecha1775141654548/assets/js/bootstrap.min.js'></script>
+
+</body>
+</html>
