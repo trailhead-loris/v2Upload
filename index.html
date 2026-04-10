@@ -143,33 +143,13 @@
                     document.getElementById('status-msg').style.color = "red";
                 }
             });
+          window.addEventListener("onEmbeddedMessagingConversationParticipantChanged", (event) => {
+                console.log(">>>EVENT onEmbeddedMessagingConversationParticipantChanged"+event.detail);
+                //do something...
+               });
 
 
-            // 3. GESTIONE CLICK LINK - AGGIORNATA PER FORMULA CON ANCHOR (#)
-            // Intercetta i link che iniziano con #, li pulisce e forza l'apertura nella stessa tab
-            window.addEventListener("onEmbeddedMessageLinkClicked", (event) => {
-                const clickedUrl = event.detail.url;
-                console.log("DEBUG - Link cliccato ricevuto:", clickedUrl);
 
-                // CASO A: Il link inizia con # (Es: #https://chogan...)
-                // Questo impedisce al browser di aprire una nuova tab automaticamente
-                if (clickedUrl && clickedUrl.startsWith("#") && clickedUrl.includes("uploadfile")) {
-                    
-                    // Rimuoviamo il primo carattere (#) per ottenere l'URL reale
-                    const realUrl = clickedUrl.substring(1);
-                    
-                    console.log(">>> Anchor Link rilevato. Reindirizzamento forzato self a:", realUrl);
-                    
-                    // Forza la navigazione nella STESSA scheda
-                    window.location.href = realUrl;
-                }
-                
-                // CASO B: Fallback per link normali (nel caso la formula non abbia messo il #)
-                else if (clickedUrl && clickedUrl.includes("uploadfile")) {
-                     console.log("Link standard rilevato (senza #). Provo a reindirizzare...");
-                     window.location.href = clickedUrl;
-                }
-            });
 
             // 4. INIZIALIZZAZIONE EFFETTIVA
             embeddedservice_bootstrap.init(
