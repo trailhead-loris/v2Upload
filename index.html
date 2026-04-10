@@ -144,7 +144,10 @@
                 }
             });
           window.addEventListener("onEmbeddedMessagingConversationParticipantChanged", (event) => {
-                console.log(">>>EVENT onEmbeddedMessagingConversationParticipantChanged"+event.detail);
+                console.log(">>>EVENT onEmbeddedMessagingConversationParticipantChanged");
+                console.log("Event detail: ", event.detail);
+
+            
                 //do something...
                });
 
