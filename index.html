@@ -81,7 +81,7 @@
   <script type='text/javascript'>
     
     function startChatSession() {
-        // Disabilita il bottone per evitare doppi click e modifiche durante il caricamento
+        
         const btn = document.getElementById('start-btn');
         btn.disabled = true;
         btn.innerText = "Caricamento...";
@@ -111,7 +111,7 @@
 
             // 2. GESTIONE EVENTO PRE-CHAT (Per Agentforce)
             window.addEventListener("onEmbeddedMessagingConversationParticipantChanged", () => {
-                console.log(">>> EVENTO: Messaging Ready and onEmbeddedMessagingConversationParticipantChanged:  Invio parametri...");
+                console.log(">>> rimosso event EVENTO: Messaging Ready and onEmbeddedMessagingConversationParticipantChanged:  Invio parametri...");
                 
                 try {
                     // Recuperiamo i valori freschi dagli input
