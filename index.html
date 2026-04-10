@@ -110,8 +110,8 @@
             
 
             // 2. GESTIONE EVENTO PRE-CHAT (Per Agentforce)
-            window.addEventListener("onEmbeddedMessagingConversationParticipantChanged", () => {
-                console.log(">>> rimosso event EVENTO: Messaging Ready and onEmbeddedMessagingConversationParticipantChanged:  Invio parametri...");
+            window.addEventListener("onEmbeddedMessagingReady", () => {
+                console.log(">>> Rollback --> EVENTO: Messaging Ready --> Invio parametri...");
                 
                 try {
                     // Recuperiamo i valori freschi dagli input
